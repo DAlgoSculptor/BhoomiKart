@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -53,10 +54,10 @@ const properties = [
       "Close to Schools",
     ],
     images: [
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
+      "/properties/villa-1.jpg",
+      "/properties/villa-2.jpg",
+      "/properties/villa-3.jpg",
+      "/properties/villa-4.jpg",
     ],
     agent: {
       name: "Rahul Sharma",
@@ -70,8 +71,10 @@ const properties = [
   },
 ]
 
-export default function PropertyDetailPage({ params }) {
-  const property = properties.find((p) => p.id === Number.parseInt(params.id)) || properties[0]
+// Client component
+export default function PropertyDetailPage() {
+  const params = useParams()
+  const property = properties.find((p) => p.id === Number.parseInt(params.id as string)) || properties[0]
   const [isFavorite, setIsFavorite] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 

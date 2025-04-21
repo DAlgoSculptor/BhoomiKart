@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
+import { signIn, useSession } from "next-auth/react"
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -32,6 +33,7 @@ type PhoneLoginFormData = z.infer<typeof phoneLoginSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -52,6 +54,12 @@ export default function LoginPage() {
   } = useForm<PhoneLoginFormData>({
     resolver: zodResolver(phoneLoginSchema),
   })
+
+  // If the user is already logged in, redirect to home
+  if (session) {
+    router.push('/')
+    return null
+  }
 
   const onSubmitEmail = async (data: LoginFormData) => {
     try {
@@ -88,6 +96,33 @@ export default function LoginPage() {
       toast({
         title: "Error",
         description: "Failed to login. Please check your credentials.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      const result = await signIn('google', { 
+        callbackUrl: '/',
+        redirect: false
+      })
+      
+      if (result?.error) {
+        toast({
+          title: "Error",
+          description: "Failed to sign in with Google. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Sign in error:', error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -246,9 +281,14 @@ export default function LoginPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full" disabled={isLoading}>
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+          <div className="mt-8 space-y-6">
+            <Button
+              onClick={handleGoogleSignIn}
+              className="w-full"
+              variant="outline"
+              disabled={isLoading}
+            >
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -266,13 +306,7 @@ export default function LoginPage() {
                   fill="#EA4335"
                 />
               </svg>
-              Google
-            </Button>
-            <Button variant="outline" className="w-full" disabled={isLoading}>
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-              </svg>
-              Facebook
+              {isLoading ? "Signing in..." : "Sign in with Google"}
             </Button>
           </div>
 
