@@ -1,6 +1,6 @@
 # BhoomiKart - Real Estate Platform
 
-![BhoomiKart Logo](docs/images\D:\OneDrive\Desktop\bhoomikart\docs\Screenshot 2025-04-22 012003.png)
+![BhoomiKart Logo](docs/images/"C:\Users\danis\Pictures\Screenshots\Screenshot 2025-04-22 012003.png")
 
 BhoomiKart is a modern real estate platform built with Next.js, TypeScript, and Tailwind CSS. It provides a seamless experience for property buyers, sellers, and agents to connect and transact.
 
